@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DevSentinel</title>
+  <meta name="description" content="DevSentinel: game developer and programmer from Jakarta, Indonesia.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23000'/%3E%3Crect x='3' y='3' width='3' height='10' fill='%2319c55a'/%3E%3Crect x='9' y='6' width='3' height='7' fill='%2319c55a'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/cursors.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="room">
+  <div class="monitor" id="monitor">
+    <div class="glass" id="glass">
+      <!-- The screen runs at a fixed resolution (1024x768) and is scaled to fit the monitor -->
+      <div class="screen" id="screen">
+
+        <canvas id="rain" aria-hidden="true"></canvas>
+        <noscript><p class="noscript">This portfolio runs as a small computer and needs JavaScript. Email me at devsentinel04@gmail.com.</p></noscript>
+
+        <!-- ================= DESKTOP ================= -->
+        <main class="desk" id="desk">
+          <h1 class="sr-only">DevSentinel, portfolio</h1>
+          <nav class="icons" id="icons" aria-label="Apps"></nav>
+
+          <!-- The rain draws whatever text is in .desk__line -->
+          <div class="desk__sig" aria-hidden="true">
+            <p class="desk__name"><span class="desk__line">Dev</span><span class="desk__line">Sentinel</span></p>
+          </div>
+          <div class="desk__about">
+            <p class="desk__role"><mark>Game developer and programmer.</mark></p>
+            <p class="desk__hint"><mark class="hint--mouse">Double-click an icon to open it.</mark><mark class="hint--touch">Tap an icon to open it.</mark></p>
+          </div>
+
+          <!-- Live system monitor widget -->
+          <aside class="sysmon" id="sysmon" aria-label="System monitor">
+            <p class="sysmon__h">sysmon</p>
+            <dl>
+              <div><dt>uptime</dt><dd id="sm-up">00:00:00</dd></div>
+              <div><dt>windows open</dt><dd id="sm-win">0</dd></div>
+              <div><dt>glyphs caught</dt><dd id="sm-glyph">0</dd></div>
+              <div><dt>secrets found</dt><dd id="sm-found">0 of 3</dd></div>
+            </dl>
+            <div class="sysmon__graph" id="sm-graph" aria-hidden="true"></div>
+            <p class="sysmon__cap">your input activity</p>
+          </aside>
+
+          <div class="windows" id="windows"></div>
+          <div class="lasso" id="lasso" hidden></div>
+        </main>
+
+        <!-- ================= TASKBAR ================= -->
+        <footer class="taskbar" id="taskbar">
+          <button class="tb__menu" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
+            <span class="tb__logo" aria-hidden="true"></span>Menu
+          </button>
+          <div class="tb__tasks" id="tasks" role="toolbar" aria-label="Open windows"></div>
+          <div class="tb__tray">
+            <button class="tray__btn" id="rain-toggle" type="button" aria-pressed="true" title="Turn the rain off">Rain <span class="tray__state">on</span></button>
+            <p class="tray__clock"><time id="clock">--:--</time> <span class="tray__label" id="tz-label">WIB</span></p>
+          </div>
+        </footer>
+
+        <!-- ================= START MENU ================= -->
+        <div class="menu" id="menu" hidden>
+          <div class="menu__head">
+            <p class="menu__name">DevSentinel</p>
+            <p class="menu__role">Game developer and programmer</p>
+          </div>
+          <ul class="menu__apps" id="menu-apps"></ul>
+          <div class="menu__foot">
+            <button type="button" data-action="crt">Screen effects: <span data-crt-label>high</span></button>
+            <button type="button" data-action="close-all">Close all</button>
+            <button type="button" data-action="restart">Restart</button>
+          </div>
+        </div>
+
+        <div class="toasts" id="toasts" aria-live="polite"></div>
+
+        <!-- ================= SCREENSAVER ================= -->
+        <div class="saver" id="saver" hidden aria-hidden="true">
+          <div class="saver__logo" id="saver-logo"></div>
+        </div>
+
+        <!-- ================= BOOT ================= -->
+        <div class="boot" id="boot" hidden>
+          <div class="boot__log" id="boot-log"></div>
+          <div class="boot__bar"><span id="boot-fill"></span></div>
+          <p class="boot__skip">Press any key to skip</p>
+        </div>
+
+        <div class="off" id="off" hidden></div>
+        <div class="fx" id="fx" aria-hidden="true"></div>
+
+        <!-- CRT filter: scanlines, glow, vignette, refresh band -->
+        <div class="crt" aria-hidden="true"><span class="crt__band"></span></div>
+      </div>
+    </div>
+
+    <!-- Monitor chin: brand, screen-effects knob, activity light, power -->
+    <div class="chin">
+      <p class="chin__brand">SENTINEL <span>1024</span></p>
+      <div class="chin__controls">
+        <button class="knob" id="crt-knob" type="button" aria-label="Screen effects: high"><span class="knob__dial" aria-hidden="true"></span><span class="knob__label">Phosphor</span></button>
+        <span class="led" id="led" aria-hidden="true"></span>
+        <button class="power" id="power" type="button" aria-pressed="true" aria-label="Turn the screen off"><span class="power__cap" aria-hidden="true"></span><span class="power__label">Power</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- =========================================================
+       APPS — each <template> is a desktop icon + a window.
+       data-title (window title), data-label (icon name), data-icon,
+       data-w / data-h (window size), data-status (status bar),
+       data-theme="scarlet" (Celestial Avian only)
+       ========================================================= -->
+
+  <!-- ABOUT -->
+  <template id="app-about" data-title="about.txt" data-label="About me" data-icon="person" data-w="760" data-h="560"
+            data-status="Drag the title bar to move. Double-click it to maximize.">
+    <div class="about">
+      <figure class="about__photo">
+        <!-- Replace with your photo (4:5 works best) -->
+        <img src="assets/img/portrait.svg" alt="Portrait of DevSentinel" width="800" height="1000">
+      </figure>
+      <div class="about__text">
+        <h2 class="app__h" data-decode>About me</h2>
+        <p class="lede">I'm DevSentinel, a programmer, developer and gaming enthusiast from Jakarta, Indonesia.</p>
+        <p>I've been interested in computers since I was little, but my fascination really took off in middle school.</p>
+        <p>These days I'm in college, taking on freelance work, and building my first game, <button class="link link--scarlet" type="button" data-open="celestial">Celestial Avian</button>.</p>
+        <dl class="facts">
+          <div><dt>based_in</dt><dd>Jakarta, Indonesia</dd></div>
+          <div><dt>working_on</dt><dd><button class="link link--scarlet" type="button" data-open="celestial">Celestial Avian</button></dd></div>
+          <div><dt>tools</dt><dd>VS Code, Godot</dd></div>
+          <div><dt>speaks</dt><dd>English, Indonesian, a bit of German</dd></div>
+          <div><dt>playing</dt><dd>osu!mania (4K/7K), Minecraft, and any story game</dd></div>
+        </dl>
+      </div>
+    </div>
+  </template>
+
+  <!-- WORK -->
+  <template id="app-work" data-title="work.log" data-label="Work" data-icon="case" data-w="600" data-h="440"
+            data-status="Most recent first">
+    <h2 class="app__h" data-decode>Work</h2>
+    <ol class="log">
+      <li class="log__item is-head">
+        <p class="log__meta"><span class="log__hash">a3f9c21</span> <span class="log__ref">HEAD</span> <time>now</time></p>
+        <h3 class="log__title">Freelance developer</h3>
+        <p>Freelance programming work alongside my studies.</p>
+      </li>
+      <li class="log__item">
+        <p class="log__meta"><span class="log__hash">51c2e9a</span> <time>in progress</time></p>
+        <h3 class="log__title">College student</h3>
+        <p>Currently studying in college.</p>
+      </li>
+    </ol>
+  </template>
+
+  <!-- ACHIEVEMENTS -->
+  <template id="app-achievements" data-title="achievements" data-label="Achievements" data-icon="trophy" data-w="640" data-h="600" data-status="">
+    <div class="ach-head">
+      <h2 class="app__h" data-decode>Achievements</h2>
+      <p class="ach-count"><span data-count-unlocked>0</span> of <span data-count-total>0</span> unlocked</p>
+    </div>
+    <div class="ach-meter" aria-hidden="true"><span data-meter></span></div>
+    <ul class="ach" data-group="mine">
+      <li class="ach__item" data-seed="math-gold">
+        <span class="ach__icon" aria-hidden="true"></span>
+        <div><h3 class="ach__title">Math olympiad gold</h3><p class="ach__desc">Multiple-time gold medalist in math olympiads.</p></div>
+        <p class="ach__when">2022 to 2026</p>
+      </li>
+      <li class="ach__item is-locked" data-seed="celestial">
+        <span class="ach__icon" aria-hidden="true"></span>
+        <div>
+          <h3 class="ach__title">Ship Celestial Avian</h3>
+          <p class="ach__desc">Release <button class="link link--scarlet" type="button" data-open="celestial">Celestial Avian</button>.</p>
+          <div class="ach__progress"><span style="--p:0.1"></span></div>
+        </div>
+        <p class="ach__when">0.1%</p>
+      </li>
+    </ul>
+
+    <!-- Visitor achievements: unlocked by whoever is using the site -->
+    <div class="ach-head ach-head--visitor">
+      <h3 class="ach-sub">Yours to find</h3>
+      <p class="ach-count"><span data-visitor-found>0</span> of <span data-visitor-total>0</span> found</p>
+    </div>
+    <ul class="ach" data-group="visitor">
+      <li class="ach__item is-locked" data-seed="v-root" data-visitor="root">
+        <span class="ach__icon" aria-hidden="true"></span>
+        <div>
+          <h3 class="ach__title"><span class="ach__scramble" data-len="11" aria-hidden="true"></span><span class="ach__real" hidden>Root access</span><span class="sr-only ach__sr">Hidden achievement</span></h3>
+          <p class="ach__desc ach__real" hidden>You talked your way into sudo.</p>
+          <button class="ach__hint-btn" type="button" aria-expanded="false">Show hint</button>
+          <p class="ach__hint" hidden>Hint: open the Terminal and type <code>sudo hire</code>.</p>
+        </div>
+        <p class="ach__when">locked</p>
+      </li>
+      <li class="ach__item is-locked" data-seed="v-explorer" data-visitor="explorer">
+        <span class="ach__icon" aria-hidden="true"></span>
+        <div>
+          <h3 class="ach__title"><span class="ach__scramble" data-len="8" aria-hidden="true"></span><span class="ach__real" hidden>Explorer</span><span class="sr-only ach__sr">Hidden achievement</span></h3>
+          <p class="ach__desc ach__real" hidden>You opened every app on this computer.</p>
+          <button class="ach__hint-btn" type="button" aria-expanded="false">Show hint</button>
+          <p class="ach__hint" hidden>Hint: open every app at least once.</p>
+        </div>
+        <p class="ach__when">locked</p>
+      </li>
+      <li class="ach__item is-locked" data-seed="v-power" data-visitor="power">
+        <span class="ach__icon" aria-hidden="true"></span>
+        <div>
+          <h3 class="ach__title"><span class="ach__scramble" data-len="17" aria-hidden="true"></span><span class="ach__real" hidden>Turn it off and on</span><span class="sr-only ach__sr">Hidden achievement</span></h3>
+          <p class="ach__desc ach__real" hidden>The oldest fix in the book.</p>
+          <button class="ach__hint-btn" type="button" aria-expanded="false">Show hint</button>
+          <p class="ach__hint" hidden>Hint: the monitor has a power button.</p>
+        </div>
+        <p class="ach__when">locked</p>
+      </li>
+    </ul>
+  </template>
+
+  <!-- HOBBIES -->
+  <template id="app-hobbies" data-title="hobbies" data-label="Hobbies" data-icon="pad" data-w="660" data-h="500"
+            data-status="2 processes. Select a row to open it.">
+    <h2 class="app__h" data-decode>Hobbies</h2>
+    <p class="app__intro">What runs when I'm not working.</p>
+    <div class="proc">
+      <div class="proc__head" aria-hidden="true"><span>PID</span><span>Hobby</span><span>Share of free time</span><span>Status</span></div>
+      <div class="proc__row">
+        <button class="proc__btn" type="button" aria-expanded="false">
+          <span class="proc__pid">101</span><span class="proc__name">Video games</span>
+          <span class="proc__bar" style="--share:33"><span></span><em>33%</em></span><span class="proc__state is-running">running</span>
+        </button>
+        <div class="proc__detail" hidden>
+          <img src="assets/img/hobby-gaming.svg" alt="Video games" width="1200" height="800">
+          <div>
+            <p>My favourites: VSRGs, both Hollow Knight games, Minecraft, and more.</p>
+            <p><a href="https://osu.ppy.sh/users/19386011" target="_blank" rel="noopener">My osu! profile</a></p>
+          </div>
+        </div>
+      </div>
+      <div class="proc__row">
+        <button class="proc__btn" type="button" aria-expanded="false">
+          <span class="proc__pid">214</span><span class="proc__name">Chess</span>
+          <span class="proc__bar" style="--share:5"><span></span><em>5%</em></span><span class="proc__state is-sleeping">sleeping</span>
+        </button>
+        <div class="proc__detail" hidden>
+          <img src="assets/img/hobby-chess.svg" alt="Chess" width="1200" height="800">
+          <div><p>Only rated 1200 ;-;</p></div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- PROJECTS (file explorer) -->
+  <template id="app-projects" data-title="~/upcoming" data-label="Projects" data-icon="folder" data-w="640" data-h="400"
+            data-status="1 item. Double-click it to open.">
+    <div class="explorer">
+      <div class="explorer__files" role="listbox" aria-label="Upcoming projects">
+        <button class="file-item" type="button" role="option" aria-selected="false" data-item="ca" data-open="celestial" data-icon="bird" data-scarlet>Celestial Avian</button>
+      </div>
+      <aside class="explorer__info" aria-live="polite">
+        <div data-info="none">
+          <h2 class="app__h" data-decode>Upcoming</h2>
+          <p class="app__intro">What I'm building now. Select a project to see details.</p>
+        </div>
+        <div data-info="ca" hidden>
+          <p class="info__state info__state--scarlet">Concept building</p>
+          <h3 class="info__title info__title--scarlet">Celestial Avian</h3>
+          <p>Coding a game is hard &gt;-&lt;</p>
+          <button class="btn btn--scarlet" type="button" data-open="celestial">Open Celestial Avian</button>
+        </div>
+      </aside>
+    </div>
+  </template>
+
+  <!-- CELESTIAL AVIAN (the rain turns scarlet while this window is in front) -->
+  <template id="app-celestial" data-title="celestial-avian.exe" data-label="Celestial Avian" data-icon="bird" data-theme="scarlet" data-w="820" data-h="640"
+            data-status="Concept stage. Godot.">
+    <article class="game">
+      <figure class="game__art">
+        <img src="assets/img/celestial-avian-keyart.svg" alt="Celestial Avian key art" width="1920" height="1080">
+        <figcaption class="game__status"><span class="pulse" aria-hidden="true"></span>Concept stage</figcaption>
+      </figure>
+      <div class="game__body">
+        <div class="game__main">
+          <h2 class="game__title" data-decode>Celestial Avian</h2>
+          <p class="game__pitch">A 2D roguelite. You play as Scarlet, and every death sends you back to the homebase before the next run.</p>
+          <p>More coming soon.</p>
+          <div class="game__cta">
+            <a class="btn btn--scarlet" href="https://github.com/devsentinel-CA" target="_blank" rel="noopener">Follow on GitHub</a>
+          </div>
+        </div>
+        <div class="game__side">
+          <dl class="game__facts">
+            <div><dt>Genre</dt><dd>2D roguelite</dd></div>
+            <div><dt>Engine</dt><dd>Godot</dd></div>
+            <div><dt>Platforms</dt><dd>PC, maybe more later</dd></div>
+            <div><dt>Release</dt><dd>TBA</dd></div>
+          </dl>
+          <div class="game__road">
+            <h3>Roadmap</h3>
+            <ol>
+              <li class="is-doing"><span class="box" aria-hidden="true">[~]</span><span>Concepts and ideas <span class="sr-only">(in progress)</span></span></li>
+              <li class="is-doing"><span class="box" aria-hidden="true">[~]</span><span>Concept art <span class="sr-only">(in progress)</span></span></li>
+              <li><span class="box" aria-hidden="true">[ ]</span><span>Everything else</span></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <ul class="game__shots">
+        <li><img src="assets/img/celestial-avian-concept-1.svg" alt="Celestial Avian concept art" width="1280" height="720"></li>
+        <li><img src="assets/img/celestial-avian-concept-2.svg" alt="Celestial Avian concept art" width="1280" height="720"></li>
+        <li><img src="assets/img/celestial-avian-concept-3.svg" alt="Celestial Avian concept art" width="1280" height="720"></li>
+      </ul>
+    </article>
+  </template>
+
+  <!-- LINKS -->
+  <template id="app-links" data-title="links.cfg" data-label="Links" data-icon="globe" data-w="540" data-h="380"
+            data-status="Email is the fastest way to reach me.">
+    <h2 class="app__h" data-decode>Find me</h2>
+    <ul class="cfg">
+      <li><a href="https://github.com/devsentinel-CA" target="_blank" rel="noopener"><span class="cfg__k">github</span><span class="cfg__eq" aria-hidden="true">=</span><span class="cfg__v">github.com/devsentinel-CA</span></a></li>
+      <li><a href="https://osu.ppy.sh/users/19386011" target="_blank" rel="noopener"><span class="cfg__k">osu!</span><span class="cfg__eq" aria-hidden="true">=</span><span class="cfg__v">osu.ppy.sh/users/19386011</span></a></li>
+      <li class="cfg__row"><span class="cfg__k">discord</span><span class="cfg__eq" aria-hidden="true">=</span><span class="cfg__v">anFNFplayer</span><button type="button" class="copy" data-copy="anFNFplayer">Copy</button></li>
+      <li class="cfg__row"><span class="cfg__k">email</span><span class="cfg__eq" aria-hidden="true">=</span><a class="cfg__v" href="mailto:devsentinel04@gmail.com">devsentinel04@gmail.com</a><button type="button" class="copy" data-copy="devsentinel04@gmail.com">Copy</button></li>
+    </ul>
+  </template>
+
+  <!-- TERMINAL -->
+  <template id="app-terminal" data-title="terminal" data-label="Terminal" data-icon="term" data-w="600" data-h="380"
+            data-status="Type help. Tab completes. Up and Down for history.">
+    <div class="term">
+      <div class="term__out" aria-live="polite"></div>
+      <form class="term__line" autocomplete="off">
+        <label class="term__prompt"><span class="term__user">visitor@devsentinel</span>:<span class="term__path">~</span>$</label>
+        <div class="term__field">
+          <span class="term__ghost" aria-hidden="true"></span>
+          <input type="text" spellcheck="false" autocapitalize="off" enterkeyhint="go" aria-label="Command">
+        </div>
+      </form>
+    </div>
+  </template>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
