@@ -120,8 +120,8 @@ input[type="text"], .term { cursor: var(--cur-text); }
 [data-crt="off"] .crt { display: none; }
 [data-crt="off"] .screen { text-shadow: none; }
 
-.off { position: absolute; inset: 0; z-index: 300; background: #000; }
-.off::after { content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; background: #e8fff0; box-shadow: 0 0 12px #9effc0; animation: afterglow 1.4s ease-out forwards; }
+.poweroff { position: absolute; inset: 0; z-index: 300; background: #000; }
+.poweroff::after { content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; background: #e8fff0; box-shadow: 0 0 12px #9effc0; animation: afterglow 1.4s ease-out forwards; }
 @keyframes afterglow { to { opacity: 0; transform: scale(.2); } }
 img { display: block; max-width: 100%; height: auto; }
 a { color: var(--head); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
