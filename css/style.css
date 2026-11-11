@@ -96,8 +96,8 @@ input[type="text"], .term { cursor: var(--cur-text); }
 }
 
 .chin { height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 10px 6px 0; }
-.chin__brand { margin: 0; font-family: var(--mono); font-size: 26px; color: #4c4e43; text-shadow: 0 1px 0 #0b0c09, 0 -1px 0 #3a3c33; }
-.chin__brand span { color: #3c3e35; }
+.chin__brand { margin: 0; font-family: var(--mono); font-size: 26px; color: #4c4e43; text-decoration: none; text-shadow: 0 1px 0 #0b0c09, 0 -1px 0 #3a3c33; }
+.chin__brand:hover { background: none; color: #8a8d7c; text-decoration: none; }
 .chin__controls { display: flex; align-items: center; gap: 22px; }
 .knob, .power { display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 4px; color: #6b6e60; font-size: 18px; }
 .knob__dial {
@@ -295,11 +295,19 @@ code { font-family: var(--mono); color: var(--head); }
 
 /* ---------- About ---------- */
 .about { display: grid; grid-template-columns: minmax(160px, 260px) 1fr; gap: 32px; align-items: start; }
-.about__photo { margin: 0; border: 1px solid var(--line); position: relative; }
-.about__photo img { filter: grayscale(1) contrast(1.1); }
-.about__photo::after { content: ""; position: absolute; inset: 0; background: var(--rain); mix-blend-mode: multiply; pointer-events: none; transition: opacity .4s; }
-.about__photo:hover::after { opacity: 0; }
-.about__photo:hover img { filter: none; }
+/* Photo shown through the green screen: mono phosphor tint, scanlines, glow */
+.about__photo { margin: 0; border: 1px solid var(--line); position: relative; overflow: hidden; background: #000; }
+.about__photo img { filter: grayscale(1) contrast(1.25) brightness(.9); }
+.about__photo::before { /* phosphor tint */
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: var(--rain); mix-blend-mode: multiply;
+}
+.about__photo::after { /* scanlines + glow + dark edges */
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, .35) 2px 3px);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, .75), inset 0 0 0 1px rgba(25, 197, 90, .25);
+}
+.about__photo:hover img { filter: grayscale(1) contrast(1.35) brightness(1.05); }
 .about__text p { margin: 0 0 14px; max-width: 62ch; }
 .lede { font-size: 24px; line-height: 1.2; color: var(--head); }
 .facts { margin: 24px 0 0; border-top: 1px solid var(--line); }
