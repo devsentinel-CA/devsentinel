@@ -52,7 +52,7 @@
     root.classList.toggle('is-full', !monitor);
     if (monitor) {
       SCREEN.w = CONFIG.screenW; SCREEN.h = CONFIG.screenH;
-      const side = 40 + 16, top = 34 + 16, bottom = 82 + 16; // bezel + breathing room
+      const side = 50 + 16, top = 46 + 16, bottom = 88 + 70 + 16; // bezel + chin + stand + room
       SCREEN.scale = Math.min((vw - side * 2) / SCREEN.w, (vh - top - bottom) / SCREEN.h);
     } else {
       SCREEN.w = vw; SCREEN.h = vh; SCREEN.scale = 1;
@@ -62,6 +62,7 @@
     screenEl.style.transform = SCREEN.scale === 1 ? '' : `scale(${SCREEN.scale})`;
     glass.style.width = `${SCREEN.w * SCREEN.scale}px`;
     glass.style.height = `${SCREEN.h * SCREEN.scale}px`;
+    root.style.setProperty('--gw', `${SCREEN.w * SCREEN.scale}px`);
     const r = glass.getBoundingClientRect();
     SCREEN.left = r.left; SCREEN.top = r.top;
   }
@@ -82,12 +83,18 @@
     trophy: ['.##########.', '#.########.#', '#.###++###.#', '.#.######.#.', '...######...', '....####....', '.....##.....', '.....##.....', '....####....', '...######...', '...######...', '............'],
     pad: ['............', '............', '.##########.', '############', '#.##++++##.#', '...#++++#.#.', '#.##++++##.#', '############', '####....####', '###......###', '............', '............'],
     folder: ['............', '.####.......', '######......', '############', '#++++++++++#', '#++++++++++#', '#++++++++++#', '#++++++++++#', '#++++++++++#', '#++++++++++#', '############', '............'],
+    bird2: ['............', '.#.....##...', '.##...####..', '..##..#.###.', '...#.#####..', '...#######..', '..########..', '..++######..', '...+#####...', '....##..#...', '....#....#..', '............'],
     bird: ['............', '.......##...', '......####..', '......#.###.', '#....#####..', '##..######..', '.#########..', '..++######..', '...+#####...', '....##..#...', '....#....#..', '............'],
     globe: ['....####....', '..##+##+##..', '.#++#++#++#.', '.#++#++#++#.', '############', '#+++#++#+++#', '#+++#++#+++#', '############', '.#++#++#++#.', '.#++#++#++#.', '..##+##+##..', '....####....'],
     term: ['############', '#++++++++++#', '#+#+++++++++', '#++#+++++++#', '#+++#++++++#', '#++#+++++++#', '#+#++####++#', '#++++++++++#', '############', '....####....', '..########..', '............'],
     doc: ['.#######....', '.#+++++##...', '.#+++++#+#..', '.#+++++####.', '.#+###++++#.', '.#++++++++#.', '.#+######+#.', '.#++++++++#.', '.#+######+#.', '.#++++++++#.', '.##########.', '............'],
   };
   function pixelSvg(name, cls = '') {
+    return `<svg class="${cls}" viewBox="0 0 12 12" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false">${pixelRects(name)}</svg>`;
+  }
+  /* Two-frame bird that hops back and forth on the desktop */
+  const birdSprite = () => `<span class="sprite" aria-hidden="true"><svg viewBox="0 0 12 12" shape-rendering="crispEdges" fill="currentColor" focusable="false"><g class="sprite__a">${pixelRects('bird')}</g><g class="sprite__b">${pixelRects('bird2')}</g></svg></span>`;
+  function pixelRects(name) {
     const rows = ICONS[name] || ICONS.doc;
     let out = '';
     rows.forEach((row, y) => {
@@ -102,7 +109,7 @@
         } else x++;
       }
     });
-    return `<svg class="${cls}" viewBox="0 0 12 12" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false">${out}</svg>`;
+    return out;
   }
   const SVG = {
     min: '<svg viewBox="0 0 10 10" aria-hidden="true"><rect x="1" y="8" width="8" height="2" fill="currentColor"/></svg>',
@@ -178,12 +185,14 @@
     const oc = document.createElement('canvas');
     oc.width = rain.cols * S; oc.height = rain.rows * S;
     const o = oc.getContext('2d', { willReadFrequently: true });
-    o.fillStyle = '#fff'; o.textBaseline = 'middle';
+    o.fillStyle = '#fff'; o.strokeStyle = '#fff'; o.textBaseline = 'middle';
+    o.lineJoin = 'miter'; o.lineWidth = S * 0.55; // thicken thin strokes so each one is at least a cell wide
     o.font = `${cs.fontWeight} ${(parseFloat(cs.fontSize) * S) / fs}px ${cs.fontFamily}`;
     lines.forEach((line) => {
       const r = localRect(line);
-      const t = cs.textTransform === 'uppercase' ? line.textContent.toUpperCase() : line.textContent;
-      o.fillText(t.trim(), (r.x * S) / fs, ((r.y + r.h / 2) * S) / fs);
+      const t = (cs.textTransform === 'uppercase' ? line.textContent.toUpperCase() : line.textContent).trim();
+      const x = (r.x * S) / fs, y = ((r.y + r.h / 2) * S) / fs;
+      o.fillText(t, x, y); o.strokeText(t, x, y);
     });
     const data = o.getImageData(0, 0, oc.width, oc.height).data;
     const mask = new Uint8Array(rain.cols * rain.rows);
@@ -336,7 +345,7 @@
     b.type = 'button';
     b.className = `icon${app.scarlet ? ' icon--scarlet' : ''}`;
     b.dataset.app = app.id;
-    b.innerHTML = `${pixelSvg(app.icon)}<span class="icon__label"></span>`;
+    b.innerHTML = `${app.icon === 'bird' ? birdSprite() : pixelSvg(app.icon)}<span class="icon__label"></span>`;
     $('.icon__label', b).textContent = app.label;
     b.addEventListener('click', (e) => { if (e.detail === 0 || isTouch()) openApp(app.id, b); else selectIcons([b]); });
     b.addEventListener('dblclick', () => openApp(app.id, b));
@@ -395,15 +404,16 @@
   function initialRect(app) {
     const D = deskSize();
     if (isPhone()) return { x: 0, y: 0, w: D.w, h: D.h };
-    const w = Math.min(app.w, D.w - 24), h = Math.min(app.h, D.h - 24);
+    const m = 20; // keep clear of the curved screen edge
+    const w = Math.min(app.w, D.w - m * 2), h = Math.min(app.h, D.h - m * 2);
     const icons = localRect(iconsEl);
     const left = icons.x + icons.w + 16;
     let x = Math.max(left, Math.round((D.w - w) / 2));
     let y = Math.max(12, Math.round((D.h - h) / 2) - 12);
     const n = WM.cascade++ % 6;
     x += n * 26; y += n * 22;
-    x = clamp(x, 8, Math.max(8, D.w - w - 8));
-    y = clamp(y, 8, Math.max(8, D.h - h - 8));
+    x = clamp(x, m, Math.max(m, D.w - w - m));
+    y = clamp(y, m, Math.max(m, D.h - h - m));
     return { x, y, w, h };
   }
 
