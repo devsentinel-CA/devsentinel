@@ -57,7 +57,7 @@ input[type="text"], .term { cursor: var(--cur-text); }
 
 /* plastic case: rounded, lit from above, with a visible underside */
 .monitor {
-  position: relative; z-index: 1;
+  position: relative; /* no z-index: the underside (::before) must sit behind the case */
   padding: 30px 34px 0;
   border-radius: 34px 34px 26px 26px !important;
   background: linear-gradient(180deg, #2f302a 0%, #22231e 38%, #1a1b17 100%);
