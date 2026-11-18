@@ -17,18 +17,15 @@
 <div class="room">
   <div class="monitor" id="monitor">
     <div class="glass" id="glass">
-      <!-- The screen runs at a fixed resolution (1024x768) and is scaled to fit the monitor -->
       <div class="screen" id="screen">
 
         <canvas id="rain" aria-hidden="true"></canvas>
         <noscript><p class="noscript">This portfolio runs as a small computer and needs JavaScript. Email me at devsentinel04@gmail.com.</p></noscript>
 
-        <!-- ================= DESKTOP ================= -->
         <main class="desk" id="desk">
           <h1 class="sr-only">DevSentinel, portfolio</h1>
           <nav class="icons" id="icons" aria-label="Apps"></nav>
 
-          <!-- The rain draws whatever text is in .desk__line -->
           <div class="desk__sig" aria-hidden="true">
             <p class="desk__name"><span class="desk__line">Dev</span><span class="desk__line">Sentinel</span></p>
           </div>
@@ -37,7 +34,6 @@
             <p class="desk__hint"><mark class="hint--mouse">Double-click an icon to open it.</mark><mark class="hint--touch">Tap an icon to open it.</mark></p>
           </div>
 
-          <!-- Live system monitor widget -->
           <aside class="sysmon" id="sysmon" aria-label="System monitor">
             <p class="sysmon__h">sysmon</p>
             <dl>
@@ -54,7 +50,6 @@
           <div class="lasso" id="lasso" hidden></div>
         </main>
 
-        <!-- ================= TASKBAR ================= -->
         <footer class="taskbar" id="taskbar">
           <button class="tb__menu" id="menu-btn" type="button" aria-expanded="false" aria-controls="menu">
             <span class="tb__logo" aria-hidden="true"></span>Menu
@@ -66,7 +61,6 @@
           </div>
         </footer>
 
-        <!-- ================= START MENU ================= -->
         <div class="menu" id="menu" hidden>
           <div class="menu__head">
             <p class="menu__name">DevSentinel</p>
@@ -82,12 +76,10 @@
 
         <div class="toasts" id="toasts" aria-live="polite"></div>
 
-        <!-- ================= SCREENSAVER ================= -->
         <div class="saver" id="saver" hidden aria-hidden="true">
           <div class="saver__logo" id="saver-logo"></div>
         </div>
 
-        <!-- ================= BOOT ================= -->
         <div class="boot" id="boot" hidden>
           <div class="boot__log" id="boot-log"></div>
           <div class="boot__bar"><span id="boot-fill"></span></div>
@@ -97,12 +89,10 @@
         <div class="poweroff" id="off" hidden></div>
         <div class="fx" id="fx" aria-hidden="true"></div>
 
-        <!-- CRT filter: scanlines, glow, vignette, refresh band -->
         <div class="crt" aria-hidden="true"><span class="crt__band"></span></div>
       </div>
     </div>
 
-    <!-- Monitor chin: brand, screen-effects knob, activity light, power -->
     <div class="chin">
       <a class="chin__brand" href="https://discord.gg/Tc7cMET83Z" target="_blank" rel="noopener" title="HOLD on Discord">HOLD</a>
       <div class="chin__controls">
@@ -115,14 +105,6 @@
   <div class="stand" aria-hidden="true"><span class="stand__neck"></span><span class="stand__base"></span></div>
 </div>
 
-  <!-- =========================================================
-       APPS — each <template> is a desktop icon + a window.
-       data-title (window title), data-label (icon name), data-icon,
-       data-w / data-h (window size), data-status (status bar),
-       data-theme="scarlet" (Celestial Avian only)
-       ========================================================= -->
-
-  <!-- ABOUT -->
   <template id="app-about" data-title="about.txt" data-label="About me" data-icon="person" data-w="760" data-h="560"
             data-status="Drag the title bar to move. Double-click it to maximize.">
     <div class="about">
@@ -145,7 +127,6 @@
     </div>
   </template>
 
-  <!-- WORK -->
   <template id="app-work" data-title="work.log" data-label="Work" data-icon="case" data-w="600" data-h="440"
             data-status="Most recent first">
     <h2 class="app__h" data-decode>Work</h2>
@@ -163,7 +144,6 @@
     </ol>
   </template>
 
-  <!-- ACHIEVEMENTS -->
   <template id="app-achievements" data-title="achievements" data-label="Achievements" data-icon="trophy" data-w="640" data-h="600" data-status="">
     <div class="ach-head">
       <h2 class="app__h" data-decode>Achievements</h2>
@@ -187,7 +167,6 @@
       </li>
     </ul>
 
-    <!-- Visitor achievements: unlocked by whoever is using the site -->
     <div class="ach-head ach-head--visitor">
       <h3 class="ach-sub">Yours to find</h3>
       <p class="ach-count"><span data-visitor-found>0</span> of <span data-visitor-total>0</span> found</p>
@@ -226,7 +205,6 @@
     </ul>
   </template>
 
-  <!-- HOBBIES -->
   <template id="app-hobbies" data-title="hobbies" data-label="Hobbies" data-icon="pad" data-w="660" data-h="500"
             data-status="2 processes. Select a row to open it.">
     <h2 class="app__h" data-decode>Hobbies</h2>
@@ -259,7 +237,6 @@
     </div>
   </template>
 
-  <!-- PROJECTS (file explorer) -->
   <template id="app-projects" data-title="~/upcoming" data-label="Projects" data-icon="folder" data-w="640" data-h="400"
             data-status="1 item. Double-click it to open.">
     <div class="explorer">
@@ -281,7 +258,6 @@
     </div>
   </template>
 
-  <!-- CELESTIAL AVIAN (the rain turns scarlet while this window is in front) -->
   <template id="app-celestial" data-title="celestial-avian.exe" data-label="Celestial Avian" data-icon="bird" data-theme="scarlet" data-w="820" data-h="640"
             data-status="Concept stage. Godot.">
     <article class="game">
@@ -323,7 +299,6 @@
     </article>
   </template>
 
-  <!-- LINKS -->
   <template id="app-links" data-title="links.cfg" data-label="Links" data-icon="globe" data-w="540" data-h="380"
             data-status="Email is the fastest way to reach me.">
     <h2 class="app__h" data-decode>Find me</h2>
@@ -335,7 +310,6 @@
     </ul>
   </template>
 
-  <!-- TERMINAL -->
   <template id="app-terminal" data-title="terminal" data-label="Terminal" data-icon="term" data-w="600" data-h="380"
             data-status="Type help. Tab completes. Up and Down for history.">
     <div class="term">

@@ -1,28 +1,18 @@
-/* =========================================================
-   DevSentinel — portfolio computer
-   - fixed-resolution screen scaled into a CRT monitor
-   - digital rain wallpaper that catches the name
-   - apps from <template> tags, opened as windows
-   - taskbar, start menu, terminal, boot, screensaver,
-     system monitor, visitor achievements, power button
-   Content lives in index.html. Settings below.
-   ========================================================= */
 (() => {
   'use strict';
 
   const CONFIG = {
-    screenW: 1024,                    // the computer's resolution
+    screenW: 1024,
     screenH: 768,
     promptUser: 'visitor@devsentinel',
     timeZone: 'Asia/Jakarta',
     timeZoneLabel: 'WIB',
-    cell: 16,                         // rain glyph size
-    tickMs: 33,                       // rain speed: lower is faster
-    bootEverySession: true,           // false = boot screen only on a visitor's first visit
-    screensaverAfterMs: 60000,        // idle time before the screensaver
+    cell: 16,
+    tickMs: 33,
+    bootEverySession: true,
+    screensaverAfterMs: 60000,
   };
 
-  /* ---------- helpers ---------- */
   const root = document.documentElement;
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isTouch = () => matchMedia('(hover: none)').matches;
@@ -32,15 +22,12 @@
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const store = {
     get(k, s) { try { return (s || localStorage).getItem(k); } catch { return null; } },
-    set(k, v, s) { try { (s || localStorage).setItem(k, v); } catch { /* ignore */ } },
+    set(k, v, s) { try { (s || localStorage).setItem(k, v); } catch {  } },
   };
   const ss = (() => { try { return sessionStorage; } catch { return null; } })();
   const anim = (el, frames, opts) => (reduceMotion || !el || !el.animate ? null : el.animate(frames, opts));
   const done = (a) => (a ? a.finished.catch(() => {}) : Promise.resolve());
 
-  /* =======================================================
-     SCREEN: fixed resolution, scaled to fit the monitor
-     ======================================================= */
   const glass = $('#glass'), screenEl = $('#screen');
   const SCREEN = { mode: 'monitor', w: CONFIG.screenW, h: CONFIG.screenH, scale: 1, left: 0, top: 0 };
   const isPhone = () => SCREEN.mode === 'full' && innerWidth <= 720;
@@ -52,7 +39,7 @@
     root.classList.toggle('is-full', !monitor);
     if (monitor) {
       SCREEN.w = CONFIG.screenW; SCREEN.h = CONFIG.screenH;
-      const side = 50 + 16, top = 46 + 16, bottom = 88 + 70 + 16; // bezel + chin + stand + room
+      const side = 50 + 16, top = 46 + 16, bottom = 88 + 70 + 16;
       SCREEN.scale = Math.min((vw - side * 2) / SCREEN.w, (vh - top - bottom) / SCREEN.h);
     } else {
       SCREEN.w = vw; SCREEN.h = vh; SCREEN.scale = 1;
@@ -74,9 +61,6 @@
   };
   layoutScreen();
 
-  /* =======================================================
-     PIXEL ICONS (12 x 12). '#' = full colour, '+' = dim.
-     ======================================================= */
   const ICONS = {
     person: ['....####....', '...######...', '...######...', '...######...', '....####....', '............', '..########..', '.##########.', '.##########.', '.###++++###.', '.##########.', '............'],
     case: ['............', '....####....', '....#..#....', '############', '############', '#####++#####', '#####++#####', '############', '############', '############', '############', '............'],
@@ -92,7 +76,7 @@
   function pixelSvg(name, cls = '') {
     return `<svg class="${cls}" viewBox="0 0 12 12" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true" focusable="false">${pixelRects(name)}</svg>`;
   }
-  /* Two-frame bird that hops back and forth on the desktop */
+
   const birdSprite = () => `<span class="sprite" aria-hidden="true"><svg viewBox="0 0 12 12" shape-rendering="crispEdges" fill="currentColor" focusable="false"><g class="sprite__a">${pixelRects('bird')}</g><g class="sprite__b">${pixelRects('bird2')}</g></svg></span>`;
   function pixelRects(name) {
     const rows = ICONS[name] || ICONS.doc;
@@ -119,18 +103,12 @@
     grip: '<svg viewBox="0 0 10 10" aria-hidden="true" fill="currentColor"><rect x="8" y="2" width="2" height="2"/><rect x="5" y="5" width="2" height="2"/><rect x="8" y="5" width="2" height="2"/><rect x="2" y="8" width="2" height="2"/><rect x="5" y="8" width="2" height="2"/><rect x="8" y="8" width="2" height="2"/></svg>',
   };
 
-  /* =======================================================
-     ACTIVITY LIGHT
-     ======================================================= */
   const led = $('#led');
   function blinkLed() {
     if (!led || !powered) return;
     led.classList.remove('is-busy'); void led.offsetWidth; led.classList.add('is-busy');
   }
 
-  /* =======================================================
-     RAIN WALLPAPER
-     ======================================================= */
   const KATA = 'ｦｧｨｩｪｫｬｭｮｯｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ';
   const SET_GREEN = KATA + '0123456789Z:.=*+-<>|';
   const SET_SCARLET = KATA + '✦✧+*✦✧';
@@ -186,7 +164,7 @@
     oc.width = rain.cols * S; oc.height = rain.rows * S;
     const o = oc.getContext('2d', { willReadFrequently: true });
     o.fillStyle = '#fff'; o.strokeStyle = '#fff'; o.textBaseline = 'middle';
-    o.lineJoin = 'miter'; o.lineWidth = S * 0.55; // thicken thin strokes so each one is at least a cell wide
+    o.lineJoin = 'miter'; o.lineWidth = S * 0.55;
     o.font = `${cs.fontWeight} ${(parseFloat(cs.fontSize) * S) / fs}px ${cs.fontFamily}`;
     lines.forEach((line) => {
       const r = localRect(line);
@@ -299,9 +277,6 @@
   } else root.classList.add('rain-off');
   $('#rain-toggle')?.addEventListener('click', () => setRain(!rain.enabled));
 
-  /* =======================================================
-     SCREEN EFFECTS (CRT) LEVEL
-     ======================================================= */
   const CRT_LEVELS = ['high', 'low', 'off'];
   const CRT_ROT = { high: '40deg', low: '-15deg', off: '-80deg' };
   let crt = store.get('crt') || (reduceMotion ? 'low' : 'high');
@@ -318,9 +293,6 @@
   const cycleCrt = () => setCrt(CRT_LEVELS[(CRT_LEVELS.indexOf(crt) + 1) % CRT_LEVELS.length]);
   $('#crt-knob')?.addEventListener('click', cycleCrt);
 
-  /* =======================================================
-     APPS
-     ======================================================= */
   const APPS = $$('template[id^="app-"]').map((tpl) => ({
     id: tpl.id.slice(4), tpl,
     title: tpl.dataset.title || tpl.id.slice(4), label: tpl.dataset.label || tpl.id.slice(4),
@@ -355,9 +327,6 @@
   const selectIcons = (list) => deskIcons().forEach((i) => i.classList.toggle('is-selected', list.includes(i)));
   const setIconOpen = (id, on) => $(`.icon[data-app="${id}"]`, iconsEl)?.classList.toggle('is-open', on);
 
-  /* =======================================================
-     VISITOR ACHIEVEMENTS + TOASTS
-     ======================================================= */
   const VISITOR = { root: 'Root access', explorer: 'Explorer', power: 'Turn it off and on' };
   const found = new Set((() => { try { return JSON.parse(store.get('found') || '[]'); } catch { return []; } })());
   const opened = new Set();
@@ -388,9 +357,6 @@
     if (win) paintVisitor(win.el, key);
   }
 
-  /* =======================================================
-     WINDOW MANAGER
-     ======================================================= */
   const desk = $('#desk'), layer = $('#windows'), tasksEl = $('#tasks'), fx = $('#fx');
   const WM = { wins: new Map(), z: 10, active: null, cascade: 0 };
   const deskSize = () => ({ w: desk.clientWidth, h: desk.clientHeight });
@@ -404,7 +370,7 @@
   function initialRect(app) {
     const D = deskSize();
     if (isPhone()) return { x: 0, y: 0, w: D.w, h: D.h };
-    const m = 20; // keep clear of the curved screen edge
+    const m = 20;
     const w = Math.min(app.w, D.w - m * 2), h = Math.min(app.h, D.h - m * 2);
     const icons = localRect(iconsEl);
     const left = icons.x + icons.w + 16;
@@ -451,7 +417,6 @@
     requestAnimationFrame(step);
   }
 
-  /* Status bar shows a short loading bar before its text */
   function loadStatus(el, text) {
     const st = $('.win__status-text', el);
     if (reduceMotion) { st.textContent = text; return; }
@@ -531,7 +496,7 @@
 
   function focusWin(W) {
     WM.active = W || null;
-    if (W) { W.el.style.zIndex = ++WM.z; try { history.replaceState(null, '', `#${W.app.id}`); } catch { /* ignore */ } }
+    if (W) { W.el.style.zIndex = ++WM.z; try { history.replaceState(null, '', `#${W.app.id}`); } catch {  } }
     WM.wins.forEach((w) => { const on = w === WM.active; w.el.classList.toggle('is-active', on); w.task.setAttribute('aria-pressed', String(on && !w.min)); });
     rain.mode = WM.active && !WM.active.min && WM.active.app.scarlet ? 'scarlet' : 'green';
   }
@@ -677,9 +642,6 @@
     openApp(b.dataset.open, b);
   });
 
-  /* =======================================================
-     APP BEHAVIOUR
-     ======================================================= */
   function initApp(id, el, W) {
     $$('.copy', el).forEach((btn) => btn.addEventListener('click', async () => {
       let ok = false;
@@ -798,7 +760,6 @@
     });
   }
 
-  /* ---------- Terminal ---------- */
   const cmdHistory = [];
   function initTerminal(el, W) {
     const out = $('.term__out', el), form = $('.term__line', el), input = $('input', form), ghost = $('.term__ghost', el), body = $('.win__body', el);
@@ -871,9 +832,6 @@
     $('.term', el).addEventListener('click', () => { if (!getSelection().toString()) input.focus({ preventScroll: true }); });
   }
 
-  /* =======================================================
-     START MENU
-     ======================================================= */
   const menu = $('#menu'), menuBtn = $('#menu-btn'), menuApps = $('#menu-apps');
   APPS.forEach((app) => {
     const li = document.createElement('li');
@@ -904,9 +862,6 @@
   $('[data-action="close-all"]', menu).addEventListener('click', () => { closeMenu(); WM.wins.forEach((w) => closeWin(w)); });
   $('[data-action="restart"]', menu).addEventListener('click', () => { closeMenu(); restart(); });
 
-  /* =======================================================
-     CLOCK + SYSTEM MONITOR
-     ======================================================= */
   const clock = $('#clock');
   let fmt;
   try { fmt = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: CONFIG.timeZone }); }
@@ -939,9 +894,6 @@
     [...graph.children].forEach((b, i) => { b.style.height = `${Math.max(2, samples[i])}%`; });
   }, 500);
 
-  /* =======================================================
-     DESKTOP: click empty space / drag-select
-     ======================================================= */
   const lasso = $('#lasso');
   desk.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 || (e.target !== desk && e.target !== iconsEl && e.target !== layer)) return;
@@ -960,9 +912,6 @@
     desk.addEventListener('pointermove', move); desk.addEventListener('pointerup', up);
   });
 
-  /* =======================================================
-     SCREENSAVER
-     ======================================================= */
   const saver = $('#saver'), saverLogo = $('#saver-logo');
   saverLogo.innerHTML = `${pixelSvg('bird')}<span>DevSentinel</span>`;
   let idleT = null, saverRAF = null, booting = false;
@@ -987,9 +936,6 @@
   function resetIdle() { clearTimeout(idleT); stopSaver(); idleT = setTimeout(startSaver, CONFIG.screensaverAfterMs); }
   ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart'].forEach((ev) => addEventListener(ev, resetIdle, { passive: true }));
 
-  /* =======================================================
-     GLITCHES (rare, small)
-     ======================================================= */
   function scheduleGlitch() {
     setTimeout(() => {
       if (powered && !booting && crt === 'high' && !document.hidden) {
@@ -1001,9 +947,6 @@
   }
   if (!reduceMotion) scheduleGlitch();
 
-  /* =======================================================
-     BOOT, POWER, RESTART
-     ======================================================= */
   const bootEl = $('#boot'), bootLog = $('#boot-log'), bootFill = $('#boot-fill'), offEl = $('#off'), powerBtn = $('#power');
   const nameText = () => $$('.desk__line').map((l) => l.textContent.trim()).join('');
 
